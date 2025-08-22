@@ -1,5 +1,5 @@
 # CS7319_Homework2
-Homework #2 for CS 7319 Software Architecture
+_Architecture Comparisons_ - Homework #2 for CS 7319 Software Architecture
 Author: Blaine Harris
 SMU - Spring 2025
 
