@@ -59,11 +59,11 @@ def analyze_line(line: str,
     expressions.
     Returns a 'Sentiment' enum.
     """
-    line_lower = line.lower()
     pos_count = 0
     neg_count = 0
-
+    
     # tokenizing words using regex
+    line_lower = line.lower()
     for word in sentiments["positive"]:
         pos_count += len(re.findall(rf'\b{re.escape(word)}\b', line_lower))
     for word in sentiments["negative"]:
