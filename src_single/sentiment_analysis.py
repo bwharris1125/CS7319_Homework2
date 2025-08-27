@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 # Enum for sentiment state
 class Sentiment(Enum):
-    POSITIVE = auto()
-    NEGATIVE = auto()
-    MIXED = auto()
-    NEUTRAL = auto()
+    Positive = 1
+    Negative = 2
+    Mixed = 3
+    Neutral = 4
 
 def get_args() -> argparse.Namespace:
     """
@@ -52,8 +52,7 @@ def read_data(file_path: Path) -> list[str]:
         logger.debug(f"Error reading file {file_path}: {e}")
     return lines
 
-def analyze_line(line: str,
-                 sentiments: dict[set[str], set[str]]) -> Sentiment:
+def map_post(line: str, sentiments: dict[set[str], set[str]]) -> Sentiment:
     """
     Counts the number of POS and NEG words in the line using regular
     expressions.
@@ -64,105 +63,102 @@ def analyze_line(line: str,
     
     # tokenizing words using regex
     line_lower = line.lower()
-    for word in sentiments["positive"]:
+    for word in sentiments["Positive"]:
         pos_count += len(re.findall(rf'\b{re.escape(word)}\b', line_lower))
-    for word in sentiments["negative"]:
+    for word in sentiments["Negative"]:
         neg_count += len(re.findall(rf'\b{re.escape(word)}\b', line_lower))
 
     # classify line
     if pos_count > 0 and neg_count == 0:
-        sentiment = Sentiment.POSITIVE
+        sentiment = Sentiment.Positive
     elif neg_count > 0 and pos_count == 0:
-        sentiment = Sentiment.NEGATIVE
+        sentiment = Sentiment.Negative
     elif pos_count > 0 and neg_count > 0:
-        sentiment = Sentiment.MIXED
+        sentiment = Sentiment.Mixed
     else:
-        sentiment = Sentiment.NEUTRAL
+        sentiment = Sentiment.Neutral
 
     return sentiment
 
-def analyze_document(file_path: Path,
+def compute_summary(file_path: Path,
                      sentiments: dict[set[str], set[str]]) -> dict[str, int]:
     """
     Analyze the provided document and return a summary of sentiment counts.
     """
     logger.debug(f"Using dataset: {file_path}")
-    logger.debug(f"Positive Words: {sentiments['positive']}")
-    logger.debug(f"Negative Words: {sentiments['negative']}")
+    logger.debug(f"Positive Words: {sentiments['Positive']}")
+    logger.debug(f"Negative Words: {sentiments['Negative']}")
 
     data_lines = read_data(file_path)
-    doc_summary = {
-        "positive": 0,
-        "negative": 0,
-        "mixed": 0,
-        "neutral": 0
+    totals = {
+        "Positive": 0,
+        "Negative": 0,
+        "Mixed": 0,
+        "Neutral": 0
     }
 
     # classify each line in the document and aggregate results
     for line in data_lines:
-        sentiment = analyze_line(line=line, sentiments=sentiments)
+        sentiment = map_post(line=line, sentiments=sentiments)
         logger.debug(f"Line: '{line}'\nSentiment: {sentiment.name}")
-        if sentiment == Sentiment.POSITIVE:
-            doc_summary["positive"] += 1
-        elif sentiment == Sentiment.NEGATIVE:
-            doc_summary["negative"] += 1
-        elif sentiment == Sentiment.MIXED:
-            doc_summary["mixed"] += 1
-        elif sentiment == Sentiment.NEUTRAL:
-            doc_summary["neutral"] += 1
+        if sentiment == Sentiment.Positive:
+            totals["Positive"] += 1
+        elif sentiment == Sentiment.Negative:
+            totals["Negative"] += 1
+        elif sentiment == Sentiment.Mixed:
+            totals["Mixed"] += 1
+        elif sentiment == Sentiment.Neutral:
+            totals["Neutral"] += 1
     
     # return aggregate results
-    return doc_summary
+    return totals
 
-def print_document_summary(doc_summary: dict) -> None:
+def print_document_summary(totals: dict) -> None:
     """
     Print document sentiment summary and the total verdict of the document.
     """
     # Print summary in required format
     print("Document Summary:")
-    print(f"Positive = {doc_summary['positive']}, "
-          f"Negative = {doc_summary['negative']}, "
-          f"Mixed = {doc_summary['mixed']}, "
-          f"Neutral = {doc_summary['neutral']} ")
+    print(f"Positive = {totals['Positive']}, "
+          f"Negative = {totals['Negative']}, "
+          f"Mixed = {totals['Mixed']}, "
+          f"Neutral = {totals['Neutral']} ")
     
     # Determine verdict
-    if doc_summary["positive"] > doc_summary["negative"]:
+    if totals["Positive"] > totals["Negative"]:
         verdict = "Happier"
-    elif doc_summary["negative"] > doc_summary["positive"]:
+    elif totals["Negative"] > totals["Positive"]:
         verdict = "Sadder"
     else:
         verdict = "Tied"
 
     print(f"Document Verdict: {verdict}")
 
-def generate_bar_chart(doc_summary: dict, file_path: Path) -> None:
+def generate_bar_chart(totals: dict, file_path: Path) -> None:
     """Generate an *optional* bar chart."""
 
-    categories = ["Positive", "Negative", "Mixed", "Neutral"]
-    values = [doc_summary["positive"],
-              doc_summary["negative"],
-              doc_summary["mixed"],
-              doc_summary["neutral"]]
-    plt.bar(categories, values, color=["green", "red", "orange", "gray"])
+    labels = list(totals.keys())
+    values = [totals[k] for k in labels]
+    plt.bar(labels, values, color=["green", "red", "orange", "gray"])
     plt.title(f"Sentiment Analysis: {file_path.name}")
     plt.ylabel("Count")
     plt.show()
 
 def main() -> None:
     sentiment_dict = {
-        "positive": set(["happy", "excited", "thrilled", "love"]),
-        "negative": set(["sad", "depressed", "angry", "upset"])
+        "Positive": set(["happy", "excited", "thrilled", "love"]),
+        "Negative": set(["sad", "depressed", "angry", "upset"])
     }
 
     args = get_args()
 
-    doc_summary = analyze_document(file_path=args.filepath, 
+    summary = compute_summary(file_path=args.filepath, 
                                    sentiments=sentiment_dict)
     
-    print_document_summary(doc_summary)
+    print_document_summary(summary)
 
     if not args.no_chart:
-        generate_bar_chart(doc_summary, args.filepath)
+        generate_bar_chart(summary, args.filepath)
 
 
 if __name__ == "__main__":
