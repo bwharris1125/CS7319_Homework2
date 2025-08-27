@@ -1,14 +1,31 @@
-# CS7319_Homework2
+# CS7319 Homework 2
 _Architecture Comparisons_ - Homework #2 for CS 7319 Software Architecture
 Author: Blaine Harris
 SMU - Spring 2025
 
-## Part A: Single-Program Acrhitecture
-I still used a "map" architecture where I attributed values to enums.
+## TODOs
+[ ] Brief description of your Part A architecture, language, and how to 
+build/run.
+[ ] Capture screenshots of Part A executing.
+[ ] Brief description of your Part B architecture, explaining where Map, 
+Shuffle, and Reduce occur.
+[ ] Capture screenshots of Part B executing.
+[ ] Compile responses into a word doc to submit
+[ ] Review and revise homework questions below.
+[ ] Work on HW 2 Bonus [Natural Lanuage Processing](instruction/CS_7319_HW2_Bonus.pdf)
 
-## Part B: MapReduce-Style Architecture
+## Part A: [Single-Program Architecture](src_single/sentiment_analysis.py)
+I still used a "map" architecture where I attributed values to enums.  
+This is "modular" but would need some refacotring to match the map reduce
+architecture.
 
-# Homework Questions:
+## Part B: [MapReduce-Style Architecture](src_mapreduce/sentiment_mapreduce_complete.ipynb)
+Jupyter notebook created from `sentiment_mapreduce_starter.ipynb`, which 
+completes all TODOs.  
+[_Jupyter Notebook Reference_](instruction/Jupyter_Notebook_Setup_Guide.pdf)
+
+# [Homework Questions:](instruction/CS_7319_HW2_Sentiment_Analysis_2_Arch.pdf)
+_Keep responses within 0.5 to 1 page(s)._
 1. Structure & responsibilities (mapper vs single pass)
     - Since I used enums for my "single pass" function I ended up using some
     similar traits to the mapper. However, my single pass is still structure
