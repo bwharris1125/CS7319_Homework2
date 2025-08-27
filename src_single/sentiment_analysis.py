@@ -1,7 +1,7 @@
 import argparse
 import logging
 import re
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -69,16 +69,14 @@ def map_post(line: str, sentiments: dict[set[str], set[str]]) -> Sentiment:
         neg_count += len(re.findall(rf'\b{re.escape(word)}\b', line_lower))
 
     # classify line
-    if pos_count > 0 and neg_count == 0:
-        sentiment = Sentiment.Positive
-    elif neg_count > 0 and pos_count == 0:
-        sentiment = Sentiment.Negative
+    if pos_count >= 1 and neg_count == 0:
+        return Sentiment.Positive
+    elif neg_count >= 1 and pos_count == 0:
+        return Sentiment.Negative
     elif pos_count > 0 and neg_count > 0:
-        sentiment = Sentiment.Mixed
+        return Sentiment.Mixed
     else:
-        sentiment = Sentiment.Neutral
-
-    return sentiment
+        return Sentiment.Neutral
 
 def compute_summary(file_path: Path,
                      sentiments: dict[set[str], set[str]]) -> dict[str, int]:
@@ -113,7 +111,7 @@ def compute_summary(file_path: Path,
     # return aggregate results
     return totals
 
-def print_document_summary(totals: dict) -> None:
+def print_summary(totals: dict) -> None:
     """
     Print document sentiment summary and the total verdict of the document.
     """
@@ -155,7 +153,7 @@ def main() -> None:
     summary = compute_summary(file_path=args.filepath, 
                                    sentiments=sentiment_dict)
     
-    print_document_summary(summary)
+    print_summary(summary)
 
     if not args.no_chart:
         generate_bar_chart(summary, args.filepath)

@@ -4,5 +4,28 @@ Author: Blaine Harris
 SMU - Spring 2025
 
 ## Part A: Single-Program Acrhitecture
+I still used a "map" architecture where I attributed values to enums.
 
 ## Part B: MapReduce-Style Architecture
+
+# Homework Questions:
+1. Structure & responsibilities (mapper vs single pass)
+    - Since I used enums for my "single pass" function I ended up using some
+    similar traits to the mapper. However, my single pass is still structure
+    around a single post file import and would require refactoring or potential
+    external infrastucture to support multiple posts.  The architecture of my 
+    implementation was primarily focused around my current expierence and how
+    we structure python programs for use in automated testing infrastructure.
+    - The way my single pass was authored should allow for a simple rework that
+    would also include the "reduction" aspect of this pattern so that all data
+    sets are immediately stored into a single dictionary to capture the rolling
+    sum.
+2. Complexity (which code is simpler? easier to evolve?) 
+    - I tried to author my single use code to be maintainable and modular, and
+    in small cases is easier to use. The map reduce may add some complexity, but
+    is in trade off for scalability.
+3. Scalability & performance (how would each handle 100,000 × data?)
+    - The map reduce pattern allows for aspects of the operation (i.e. mapping, 
+    evaluating the text, creating summing sentiment values, etc.) to be shared 
+    across multiple processes. While not currently implemented here, these could
+    be split into differnet applications that can run across multiple processes. 
